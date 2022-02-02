@@ -545,7 +545,7 @@ Rails.application.routes.draw do
     end
     # project permissions
     resources :permissions, only: [:index]
-    resources :permissions, except: [:edit, :update, :index], defaults: { format: 'json' }
+    resources :permissions, except: [:edit, :index], defaults: { format: 'json' }
     # HTML project site item
     resources :sites, except: [:index] do
       member do

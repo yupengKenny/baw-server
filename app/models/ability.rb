@@ -227,13 +227,10 @@ class Ability
     # DELETE /projects/:project_id/permissions/:id permissions#destroy {:format=>"json"}
 
     # any user, including guest, with reader permissions on project can access #new
-    can [:new], Permission do |permission|
-      check_model(permission)
-      Access::Core.can?(user, :reader, permission.project)
-    end
+    can [:new], Permission
 
     # only owners can list, change, or remove permissions
-    can [:index, :show, :create, :destroy], Permission do |permission|
+    can [:index, :show, :create, :update, :destroy, :filter], Permission do |permission|
       check_model(permission)
       Access::Core.can?(user, :owner, permission.project)
     end

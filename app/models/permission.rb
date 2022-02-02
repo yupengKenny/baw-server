@@ -114,6 +114,34 @@ class Permission < ApplicationRecord
     }
   end
 
+  def self.schema
+    {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        id: Api::Schema.id,
+        **Api::Schema.updater_and_creator_user_stamps,
+        project_id: Api::Schema.id(read_only: false),
+        level: Api::Schema.permission_levels,
+        user_id: Api::Schema.id(nullable: true, read_only: false),
+        allow_logged_in: { type: 'boolean' },
+        allow_anonymous: { type: 'boolean' }
+      },
+      required: [
+        :id,
+        :project_id,
+        :creator_id,
+        :created_at,
+        :updater_id,
+        :updated_at,
+        :level,
+        :user_id,
+        :allow_anonymous,
+        :allow_logged_in
+      ]
+    }.freeze
+  end
+
   private
 
   # must have only one set

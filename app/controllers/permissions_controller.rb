@@ -75,6 +75,19 @@ class PermissionsController < ApplicationController
     end
   end
 
+  # PUT|PATCH /projects/:project_id/permissions/:id
+  def update
+    do_load_resource #      @permission = Permission.find(params[:id])
+    get_project #           @project = Project.find(params[:project_id])
+    do_authorize_instance # authorize! :update @permission
+
+    if @permission.update(permission_params)
+      respond_show
+    else
+      respond_change_fail
+    end
+  end
+
   # DELETE /projects/:project_id/permissions/:id
   def destroy
     do_load_resource
@@ -88,6 +101,19 @@ class PermissionsController < ApplicationController
     end
   end
 
+  # GET|POST /permissions/filter
+  def filter
+    do_authorize_class
+
+    filter_response, opts = Settings.api_response.response_advanced(
+      api_filter_params,
+      Access::ByPermission.permissions(current_user),
+      Permission,
+      Permission.filter_settings
+    )
+    respond_filter(filter_response, opts)
+  end
+
   private
 
   def get_project
@@ -97,7 +123,7 @@ class PermissionsController < ApplicationController
   end
 
   def permission_params
-    params.require(:permission).permit(:level, :project_id, :user_id)
+    params.require(:permission).permit(:level, :project_id, :user_id, :allow_logged_in, :allow_anonymous)
   end
 
   def update_permissions_params
@@ -105,6 +131,7 @@ class PermissionsController < ApplicationController
   end
 
   def update_permissions
+
     return nil if !params.include?(:project_wide) && !params.include?(:per_user)
 
     request_params = update_permissions_params
